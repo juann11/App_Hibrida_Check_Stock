@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Stock</title>
+  <!-- Vite compilará automáticamente este archivo SASS -->
+  <link rel="stylesheet" href="./src/styles/main.scss">
+</head>
+<body>
+
+  <!-- Barra de navegación fija -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <!-- Asegúrate de colocar un icono con fondo transparente en src/assets/ -->
+      <img src="./src/assets/logo.svg" alt="Logo de la app">
+      <span>Check Stock</span>
+    </div>
+    <div class="nav-menu">
+      <button data-target="vista-home">Inicio</button>
+      <button data-target="vista-inventario">Inventario</button>
+      <button data-target="vista-reportes">Reportes</button>
+    </div>
+  </nav>
+
+  <!-- Contenedor dinámico de vistas SPA -->
+  <main class="app-container">
+    <section class="view active" id="vista-home">
+      <h1>Panel Principal</h1>
+      <p>Bienvenido al sistema de control y gestión offline.</p>
+    </section>
+
+    <section class="view" id="vista-inventario">
+      <h1>Gestión de Inventario</h1>
+      <p>Administra los productos, entradas y salidas de stock.</p>
+    </section>
+
+    <section class="view" id="vista-reportes">
+      <h1>Reportes</h1>
+      <p>Consulta el historial y los estados actuales de los elementos.</p>
+    </section>
+  </main>
+
+  <!-- Script principal de JavaScript -->
+  <script type="module" src="./src/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+@import 'variables';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: $color-bg;
+  color: $color-text-main;
+}
+
+/* Barra de navegación fija con identidad visual */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: $color-primary;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    span {
+      font-weight: bold;
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .nav-menu {
+    display: flex;
+    gap: 15px;
+
+    button {
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      cursor: pointer;
+      font-size: 0.95rem;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
+
+/* Contenedor principal de vistas SPA */
+.app-container {
+  margin-top: 80px; /* Espacio para que la navbar fija no tape el contenido */
+  padding: 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+
+  .view {
+    display: none; /* Ocultas por defecto */
+
+    &.active {
+      display: block; /* Solo se muestra la sección activa */
+    }
+  }
+}
