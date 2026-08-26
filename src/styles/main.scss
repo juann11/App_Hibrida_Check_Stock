@@ -454,3 +454,75 @@ body {
     }
   }
 }
+
+/* Mini Dashboard */
+.mini-dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  .mini-stat-card {
+    background: #27272a;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    span { font-size: 0.78rem; color: #a1a1aa; }
+    strong { font-size: 1.3rem; color: #f4f4f5; }
+
+    &.warning {
+      border-left: 4px solid #eab308;
+      strong { color: #facc15; }
+    }
+  }
+}
+
+/* Backup Controls */
+.backup-section {
+  margin-top: 20px;
+  .backup-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .custom-file-upload {
+    cursor: pointer;
+    display: inline-block;
+  }
+}
+
+/* Reportes & Pills */
+.report-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  .pills-container {
+    display: flex;
+    gap: 8px;
+    
+    .pill-report {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      color: #a1a1aa;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+
+      &.active {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+      }
+    }
+  }
+}
+
+.card-low-stock {
+  border-left: 4px solid #eab308 !important;
+}

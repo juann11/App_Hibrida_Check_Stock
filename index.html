@@ -14,7 +14,6 @@
   <section id="vista-login" class="login-overlay">
     <div class="login-card">
       <div class="login-brand">
-        
         <img src="/logo.png" alt="Check Stock Logo" class="brand-logo-img">
         <h1>Check Stock</h1>
         <p id="auth-subtitle">Sistema de Control de Inventario</p>
@@ -85,6 +84,7 @@
         <button class="btn-secondary-sm" id="btn-logout" title="Cerrar Sesión">🚪 Salir</button>
       </header>
 
+      <!-- Tarjetas de Métricas Principales -->
       <div class="stats-container">
         <div class="stat-card">
           <span class="stat-icon">📋</span>
@@ -97,6 +97,12 @@
           <p>Stock Total</p>
         </div>
       </div>
+
+      <!-- Mini Dashboard (Métricas Avanzadas) -->
+      <section class="mini-dashboard-section">
+        <div class="section-title">Resumen General</div>
+        <div id="mini-dashboard-stats" class="mini-dash-grid"></div>
+      </section>
 
       <div class="section-title">Acceso Rápido</div>
       <div class="quick-access">
@@ -112,7 +118,7 @@
         <button class="btn-primary-sm" id="btn-toggle-alert-form">+ Nueva Alerta</button>
       </div>
 
-      <!-- Formulario Crear Alerta (Oculto por defecto) -->
+      <!-- Formulario Crear Alerta -->
       <form id="form-nueva-alerta" class="card-form hidden">
         <h4>Crear Nueva Alerta</h4>
         <input type="text" id="new-alert-title" placeholder="Título de la alerta (Ej. Revisión stock)" required>
@@ -124,6 +130,18 @@
       </form>
 
       <div id="alerts-list-container"></div>
+
+      <!-- Sección de Respaldo y Seguridad (Backup/Restore JSON) -->
+      <section class="backup-section">
+        <div class="section-title">Respaldo y Seguridad</div>
+        <div class="backup-buttons">
+          <button id="btn-export-backup" class="btn-secondary">📥 Exportar Backup (.json)</button>
+          <label for="input-import-backup" class="btn-secondary custom-file-upload">
+            📤 Importar Backup (.json)
+          </label>
+          <input type="file" id="input-import-backup" accept=".json" style="display:none;" />
+        </div>
+      </section>
     </section>
 
     <!-- 2. INVENTARIO -->
@@ -158,6 +176,7 @@
       <div class="filter-pills" id="filter-pills">
         <button class="pill active" data-filter="all">Total</button>
         <button class="pill" data-filter="disponible">Disponible</button>
+        <button class="pill" data-filter="critico">⚠️ Crítico</button>
         <button class="pill" data-filter="agotado">Agotado</button>
       </div>
 
@@ -209,12 +228,24 @@
       </header>
 
       <div class="section-title">Historial de Movimientos</div>
+      
+      <!-- Filtros por Fecha y Botón de Exportación CSV -->
+      <div class="report-controls">
+        <div id="report-date-filters" class="pills-container">
+          <button class="pill-report active" data-period="todos">Todos</button>
+          <button class="pill-report" data-period="hoy">Hoy</button>
+          <button class="pill-report" data-period="semana">Esta Semana</button>
+          <button class="pill-report" data-period="mes">Este Mes</button>
+        </div>
+        <button id="btn-export-csv" class="btn-primary full-btn">📊 Exportar Reporte a CSV</button>
+      </div>
+
       <div id="movements-history-container" class="history-list"></div>
     </section>
 
   </main>
 
-  <!-- NAVIGATION BAR INFERIOR CON TEXTO E ÍCONOS -->
+  <!-- NAVIGATION BAR INFERIOR -->
   <nav class="bottom-navbar" id="bottom-nav">
     <button class="nav-icon-btn active" data-target="vista-dashboard">
       <span class="nav-icon">🏠</span>
