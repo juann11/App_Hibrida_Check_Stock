@@ -4,40 +4,78 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Check Stock</title>
-  <script type="module" crossorigin src="/assets/index-ogQOK7Kx.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-_kDciW4z.css">
+  <script type="module" crossorigin src="/assets/index-CBPx-d7F.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-43TBmPsz.css">
 </head>
-<body>
+<body class="not-authenticated">
 
   <!-- Toast de Notificaciones -->
   <div id="toast-notification" class="toast hidden"></div>
 
-  <!-- App Container (Full Viewport) -->
-  <main class="app-container">
-
-    <!-- 0. PANTALLA DE LOGIN -->
-    <section class="view active" id="vista-login">
-      <div class="login-card">
-        <div class="login-brand">
-          <span class="brand-icon">📦</span>
-          <h1>Check Stock</h1>
-          <p>Control de Inventario Híbrido</p>
-        </div>
-
-        <form id="form-login" class="login-form">
-          <div class="form-group">
-            <label for="login-user">Usuario / Email</label>
-            <input type="text" id="login-user" placeholder="admin" required>
-          </div>
-          <div class="form-group">
-            <label for="login-pass">Contraseña</label>
-            <input type="password" id="login-pass" placeholder="••••••••" required>
-          </div>
-          <button type="submit" class="btn-primary full-btn">INICIAR SESIÓN</button>
-        </form>
+  <!-- PANTALLA DE AUTH (Full Overlay Bloqueante) -->
+  <section id="vista-login" class="login-overlay">
+    <div class="login-card">
+      <div class="login-brand">
+        <span class="brand-icon">📦</span>
+        <h1>Check Stock</h1>
+        <p id="auth-subtitle">Sistema de Control de Inventario</p>
       </div>
-    </section>
 
+      <!-- Formulario 1: Inicio de Sesión -->
+      <form id="form-login" class="auth-form">
+        <div class="form-group">
+          <label for="login-user">Usuario / Email</label>
+          <input type="text" id="login-user" placeholder="Ej. admin" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Contraseña</label>
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-primary full-btn">INICIAR SESIÓN</button>
+        <div class="auth-links">
+          <button type="button" class="link-btn" id="go-to-register">¿No tienes cuenta? Regístrate</button>
+          <button type="button" class="link-btn" id="go-to-forgot">¿Olvidaste tu contraseña?</button>
+        </div>
+      </form>
+
+      <!-- Formulario 2: Crear Cuenta -->
+      <form id="form-register" class="auth-form hidden">
+        <div class="form-group">
+          <label for="reg-user">Usuario</label>
+          <input type="text" id="reg-user" placeholder="Nombre de usuario" required>
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Correo Electrónico</label>
+          <input type="email" id="reg-email" placeholder="correo@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label for="reg-pass">Contraseña</label>
+          <input type="password" id="reg-pass" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary full-btn">CREAR CUENTA</button>
+        <div class="auth-links">
+          <button type="button" class="link-btn" id="go-to-login-from-reg">Volver a Inicio de Sesión</button>
+        </div>
+      </form>
+
+      <!-- Formulario 3: Olvidé mi Contraseña -->
+      <form id="form-forgot" class="auth-form hidden">
+        <p class="auth-info-text">Ingresa tu usuario o correo para enviarte las instrucciones de recuperación.</p>
+        <div class="form-group">
+          <label for="forgot-input">Usuario o Correo</label>
+          <input type="text" id="forgot-input" placeholder="Ej. admin@correo.com" required>
+        </div>
+        <button type="submit" class="btn-primary full-btn">RECUPERAR CLAVE</button>
+        <div class="auth-links">
+          <button type="button" class="link-btn" id="go-to-login-from-forgot">Volver a Inicio de Sesión</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- APP PRINCIPAL (Protegida) -->
+  <main class="app-container" id="app-main-content">
+    
     <!-- 1. DASHBOARD -->
     <section class="view" id="vista-dashboard">
       <header class="app-header header-actions">
@@ -69,7 +107,23 @@
         <button class="quick-btn" id="btn-quick-rep"><span>📊</span><small>Reportes</small></button>
       </div>
 
-      <div class="section-title">Alertas Recientes (<span id="alert-count">0</span>)</div>
+      <!-- Sección de Alertas -->
+      <div class="section-header-inline">
+        <div class="section-title">Alertas Recientes (<span id="alert-count">0</span>)</div>
+        <button class="btn-primary-sm" id="btn-toggle-alert-form">+ Nueva Alerta</button>
+      </div>
+
+      <!-- Formulario Crear Alerta (Oculto por defecto) -->
+      <form id="form-nueva-alerta" class="card-form hidden">
+        <h4>Crear Nueva Alerta</h4>
+        <input type="text" id="new-alert-title" placeholder="Título de la alerta (Ej. Revisión stock)" required>
+        <textarea id="new-alert-text" rows="2" placeholder="Detalle o descripción de la alerta..." required></textarea>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary full-btn">Guardar Alerta</button>
+          <button type="button" class="btn-secondary full-btn" id="btn-cancel-alert">Cancelar</button>
+        </div>
+      </form>
+
       <div id="alerts-list-container"></div>
     </section>
 
@@ -83,7 +137,6 @@
         <button class="btn-primary-sm" id="btn-toggle-new-product">+ Nuevo</button>
       </header>
 
-      <!-- Formulario Desplegable para Nuevo Producto -->
       <form id="form-nuevo-producto" class="card-form hidden">
         <h4>Registrar Nuevo Producto</h4>
         <input type="text" id="new-prod-name" placeholder="Nombre del Producto" required>
@@ -162,12 +215,24 @@
 
   </main>
 
-  <!-- Navigation Bar Inferior -->
-  <nav class="bottom-navbar hidden" id="bottom-nav">
-    <button class="nav-icon-btn active" data-target="vista-dashboard" aria-label="Dashboard">🏠</button>
-    <button class="nav-icon-btn" data-target="vista-inventario" aria-label="Inventario">📦</button>
-    <button class="nav-icon-btn" data-target="vista-movimiento" aria-label="Movimientos">📋</button>
-    <button class="nav-icon-btn" data-target="vista-reportes" aria-label="Reportes">📊</button>
+  <!-- NAVIGATION BAR INFERIOR CON TEXTO E ÍCONOS -->
+  <nav class="bottom-navbar" id="bottom-nav">
+    <button class="nav-icon-btn active" data-target="vista-dashboard">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Inicio</span>
+    </button>
+    <button class="nav-icon-btn" data-target="vista-inventario">
+      <span class="nav-icon">📦</span>
+      <span class="nav-label">Inventario</span>
+    </button>
+    <button class="nav-icon-btn" data-target="vista-movimiento">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Movimientos</span>
+    </button>
+    <button class="nav-icon-btn" data-target="vista-reportes">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Reportes</span>
+    </button>
   </nav>
 
 </body>

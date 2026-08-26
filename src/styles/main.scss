@@ -14,8 +14,84 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+
+  &.not-authenticated {
+    overflow: hidden !important;
+    .app-container,
+    .bottom-navbar {
+      display: none !important;
+    }
+  }
 }
 
+/* Auth Overlay y Formularios */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #F8F9FA;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  &.hidden { display: none !important; }
+
+  .login-card {
+    width: 100%;
+    max-width: 360px;
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 16px;
+    padding: 28px 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  }
+
+  .login-brand {
+    text-align: center;
+    margin-bottom: 20px;
+    .brand-icon { font-size: 2.5rem; }
+    h1 { font-size: 1.4rem; font-weight: 800; color: #18181B; margin-top: 2px; }
+    p { font-size: 0.8rem; color: #71717A; }
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    &.hidden { display: none; }
+  }
+
+  .auth-info-text {
+    font-size: 0.8rem;
+    color: #71717A;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .auth-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: #18181B;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+      opacity: 0.8;
+      &:hover { opacity: 1; }
+    }
+  }
+}
+
+/* Toast */
 .toast {
   position: fixed;
   top: 16px;
@@ -27,7 +103,7 @@ body {
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  z-index: 2000;
+  z-index: 10000;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transition: opacity 0.3s ease, transform 0.3s ease;
 
@@ -50,7 +126,6 @@ body {
   }
 }
 
-/* Header & Botón de Devolverse */
 .app-header {
   margin-bottom: 16px;
   h2 { font-size: 1.4rem; font-weight: 700; color: #18181B; }
@@ -61,12 +136,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
   }
 }
 
@@ -86,36 +156,13 @@ body {
   &:active { background: #F4F4F5; }
 }
 
-/* Pantalla de Login */
-#vista-login {
-  height: 100%;
+.section-header-inline {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  margin: 18px 0 10px 0;
 
-  .login-card {
-    width: 100%;
-    max-width: 360px;
-    background: #FFFFFF;
-    border: 1px solid #E4E4E7;
-    border-radius: 16px;
-    padding: 28px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  }
-
-  .login-brand {
-    text-align: center;
-    margin-bottom: 24px;
-    .brand-icon { font-size: 2.5rem; }
-    h1 { font-size: 1.5rem; font-weight: 800; color: #18181B; margin-top: 4px; }
-    p { font-size: 0.8rem; color: #71717A; }
-  }
-
-  .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
+  .section-title { margin: 0; }
 }
 
 .section-title {
@@ -209,7 +256,7 @@ body {
   h4 { font-size: 0.95rem; font-weight: 700; color: #18181B; }
   .form-row { display: flex; gap: 8px; }
   
-  input {
+  input, textarea {
     font-size: 16px;
     padding: 10px;
     border: 1px solid #E4E4E7;
@@ -290,11 +337,7 @@ body {
   }
 }
 
-.mov-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+.mov-form { display: flex; flex-direction: column; gap: 14px; }
 
 .mov-type-grid {
   display: flex;
@@ -346,7 +389,7 @@ body {
 
 .btn-primary.full-btn {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background: #18181B;
   color: #FFF;
   border: none;
@@ -366,6 +409,7 @@ body {
   cursor: pointer;
 }
 
+/* Navbar Inferior Estilizada con Texto */
 .bottom-navbar {
   position: fixed;
   bottom: 0;
@@ -379,15 +423,25 @@ body {
   align-items: center;
   z-index: 1000;
 
-  &.hidden { display: none; }
-
   .nav-icon-btn {
     background: transparent;
     border: none;
-    font-size: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0.5;
     transition: opacity 0.2s, transform 0.2s;
-    &.active { opacity: 1; transform: scale(1.15); }
+
+    .nav-icon { font-size: 1.25rem; line-height: 1; }
+    .nav-label { color: #FFFFFF; font-size: 0.65rem; font-weight: 600; }
+
+    &.active {
+      opacity: 1;
+      transform: translateY(-2px);
+      .nav-label { color: #FFFFFF; font-weight: 700; }
+    }
   }
 }

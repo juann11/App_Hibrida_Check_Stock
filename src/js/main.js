@@ -1,11 +1,14 @@
 import '../styles/main.scss';
 
-const STORAGE_KEY = 'check_stock_app_state_v4';
+const STORAGE_KEY = 'check_stock_app_state_v6';
 
 const defaultState = {
   auth: {
     isAuthenticated: false,
-    user: null
+    user: null,
+    registeredUsers: [
+      { user: 'admin', pass: 'admin123', email: 'admin@checkstock.com' }
+    ]
   },
   products: [
     { id: '1', name: 'Cajas de Teclados', sku: '3422', stock: 120, location: 'Bodega L5' },
@@ -31,20 +34,21 @@ function showToast(message) {
   const toast = document.getElementById('toast-notification');
   toast.textContent = message;
   toast.classList.remove('hidden');
-  setTimeout(() => {
-    toast.classList.add('hidden');
-  }, 2500);
+  setTimeout(() => toast.classList.add('hidden'), 2500);
 }
 
-// Control de vistas y barra inferior
+// ROUTE GUARD Y CAMBIO DE VISTA
 function switchView(targetId) {
-  const bottomNav = document.getElementById('bottom-nav');
+  const loginOverlay = document.getElementById('vista-login');
 
-  if (targetId === 'vista-login') {
-    bottomNav.classList.add('hidden');
-  } else {
-    bottomNav.classList.remove('hidden');
+  if (!state.auth.isAuthenticated) {
+    document.body.classList.add('not-authenticated');
+    loginOverlay.classList.remove('hidden');
+    return;
   }
+
+  document.body.classList.remove('not-authenticated');
+  loginOverlay.classList.add('hidden');
 
   document.querySelectorAll('.app-container .view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.bottom-navbar .nav-icon-btn').forEach(b => b.classList.remove('active'));
@@ -56,8 +60,17 @@ function switchView(targetId) {
   if (activeNavBtn) activeNavBtn.classList.add('active');
 }
 
-// Dashboard
+// CAMBIO DE FORMULARIOS DENTRO DE AUTH
+function showAuthForm(formId, subtitleText) {
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
+  document.getElementById(formId).classList.remove('hidden');
+  document.getElementById('auth-subtitle').textContent = subtitleText;
+}
+
+// RENDER DASHBOARD (Incluye Alertas)
 function renderDashboard() {
+  if (!state.auth.isAuthenticated) return;
+
   const totalStock = state.products.reduce((acc, p) => acc + Number(p.stock), 0);
   document.getElementById('dash-total-stock').textContent = totalStock;
   document.getElementById('dash-total-movs').textContent = state.movements.length;
@@ -103,10 +116,12 @@ function renderDashboard() {
   });
 }
 
-// Inventario
+// RENDER INVENTARIO
 let currentFilter = 'all';
 
 function renderInventory() {
+  if (!state.auth.isAuthenticated) return;
+
   const container = document.getElementById('inventory-cards-container');
   const searchVal = document.getElementById('search-input').value.toLowerCase().trim();
 
@@ -159,8 +174,10 @@ function renderInventory() {
   });
 }
 
-// Formulario de Movimiento e Historial
+// MOVIMIENTOS E HISTORIAL
 function setupMovementForm() {
+  if (!state.auth.isAuthenticated) return;
+
   const select = document.getElementById('mov-producto-select');
   select.innerHTML = '';
 
@@ -180,6 +197,8 @@ function setupMovementForm() {
 let activeMovType = 'ENTRADA';
 
 function renderMovementsHistory() {
+  if (!state.auth.isAuthenticated) return;
+
   const container = document.getElementById('movements-history-container');
   container.innerHTML = '';
 
@@ -202,26 +221,85 @@ function renderMovementsHistory() {
   });
 }
 
-// Eventos e Inicialización
+// LISTENERS Y CONFIGURACIÓN INICIAL
 document.addEventListener('DOMContentLoaded', () => {
 
-  // Login Submit
+  // Transiciones de Auth Form Flow
+  document.getElementById('go-to-register').addEventListener('click', () => {
+    showAuthForm('form-register', 'Crear una nueva cuenta');
+  });
+  document.getElementById('go-to-forgot').addEventListener('click', () => {
+    showAuthForm('form-forgot', 'Recuperar contraseña');
+  });
+  document.getElementById('go-to-login-from-reg').addEventListener('click', () => {
+    showAuthForm('form-login', 'Sistema de Control de Inventario');
+  });
+  document.getElementById('go-to-login-from-forgot').addEventListener('click', () => {
+    showAuthForm('form-login', 'Sistema de Control de Inventario');
+  });
+
+  // Submit Login
   document.getElementById('form-login').addEventListener('submit', (e) => {
     e.preventDefault();
-    const user = document.getElementById('login-user').value.trim();
-    const pass = document.getElementById('login-pass').value.trim();
+    const userVal = document.getElementById('login-user').value.trim();
+    const passVal = document.getElementById('login-pass').value.trim();
 
-    if (user && pass) {
+    const foundUser = state.auth.registeredUsers.find(
+      u => (u.user.toLowerCase() === userVal.toLowerCase() || u.email.toLowerCase() === userVal.toLowerCase()) && u.pass === passVal
+    );
+
+    if (foundUser || (userVal && passVal)) {
       state.auth.isAuthenticated = true;
-      state.auth.user = user;
+      state.auth.user = foundUser ? foundUser.user : userVal;
       saveState();
 
       renderDashboard();
+      renderInventory();
+      setupMovementForm();
+      renderMovementsHistory();
+
       switchView('vista-dashboard');
-      showToast(`¡Bienvenido, ${user}!`);
+      showToast(`¡Bienvenido, ${state.auth.user}!`);
     } else {
-      showToast("Ingresa credenciales válidas.");
+      showToast("Credenciales incorrectas.");
     }
+  });
+
+  // Submit Registro
+  document.getElementById('form-register').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('reg-user').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value.trim();
+
+    if (!user || !email || !pass) return showToast("Completa todos los campos.");
+
+    const exists = state.auth.registeredUsers.some(u => u.user.toLowerCase() === user.toLowerCase());
+    if (exists) return showToast("El usuario ya existe.");
+
+    state.auth.registeredUsers.push({ user, email, pass });
+    state.auth.isAuthenticated = true;
+    state.auth.user = user;
+    saveState();
+
+    renderDashboard();
+    renderInventory();
+    setupMovementForm();
+    renderMovementsHistory();
+
+    switchView('vista-dashboard');
+    showToast("Cuenta creada con éxito.");
+  });
+
+  // Submit Recuperar Clave
+  document.getElementById('form-forgot').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('forgot-input').value.trim();
+    if (!input) return;
+
+    showToast("Instrucciones enviadas a tu correo.");
+    document.getElementById('form-forgot').reset();
+    showAuthForm('form-login', 'Sistema de Control de Inventario');
   });
 
   // Logout
@@ -233,16 +311,41 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast("Sesión cerrada.");
   });
 
-  // Delegación de Navegación SPA y Botones de Retorno (←)
+  // Formulario de Nueva Alerta
+  const alertForm = document.getElementById('form-nueva-alerta');
+  document.getElementById('btn-toggle-alert-form').addEventListener('click', () => {
+    alertForm.classList.remove('hidden');
+  });
+  document.getElementById('btn-cancel-alert').addEventListener('click', () => {
+    alertForm.classList.add('hidden');
+  });
+
+  alertForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = document.getElementById('new-alert-title').value.trim();
+    const text = document.getElementById('new-alert-text').value.trim();
+
+    if (!title || !text) return showToast("Ingresa título y descripción.");
+
+    state.alerts.push({ id: 'a_' + Date.now(), title, text });
+    saveState();
+
+    alertForm.reset();
+    alertForm.classList.add('hidden');
+    renderDashboard();
+    showToast("¡Alerta creada!");
+  });
+
+  // Delegación de Navegación
   document.body.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-target]');
-    if (btn && state.auth.isAuthenticated) {
+    if (btn) {
       e.preventDefault();
       switchView(btn.getAttribute('data-target'));
     }
   });
 
-  // Filtros
+  // Buscador y Filtros
   document.getElementById('filter-pills').addEventListener('click', (e) => {
     if (e.target.classList.contains('pill')) {
       document.querySelectorAll('#filter-pills .pill').forEach(p => p.classList.remove('active'));
@@ -252,17 +355,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Buscador
   document.getElementById('search-input').addEventListener('input', renderInventory);
 
-  // Formulario Nuevo Producto
+  // Form Nuevo Producto
   const newProdForm = document.getElementById('form-nuevo-producto');
-  document.getElementById('btn-toggle-new-product').addEventListener('click', () => {
-    newProdForm.classList.remove('hidden');
-  });
-  document.getElementById('btn-cancel-product').addEventListener('click', () => {
-    newProdForm.classList.add('hidden');
-  });
+  document.getElementById('btn-toggle-new-product').addEventListener('click', () => newProdForm.classList.remove('hidden'));
+  document.getElementById('btn-cancel-product').addEventListener('click', () => newProdForm.classList.add('hidden'));
 
   newProdForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -271,10 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stock = Number(document.getElementById('new-prod-stock').value);
     const location = document.getElementById('new-prod-loc').value.trim();
 
-    if (!name || !sku || isNaN(stock) || stock < 0) {
-      showToast("Por favor ingresa datos válidos.");
-      return;
-    }
+    if (!name || !sku || isNaN(stock) || stock < 0) return showToast("Datos inválidos.");
 
     state.products.push({ id: 'p_' + Date.now(), name, sku, stock, location });
     saveState();
@@ -284,10 +379,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderInventory();
     setupMovementForm();
     renderDashboard();
-    showToast("¡Producto registrado con éxito!");
+    showToast("¡Producto registrado!");
   });
 
-  // Selector Tipo de Movimiento
+  // Selector Tipo Movimiento
   document.getElementById('mov-type-selector').addEventListener('click', (e) => {
     if (e.target.classList.contains('pill-type')) {
       document.querySelectorAll('#mov-type-selector .pill-type').forEach(b => b.classList.remove('active'));
@@ -296,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // accesos Rápidos
+  // Accesos Rápidos
   document.getElementById('btn-quick-entrada').addEventListener('click', () => {
     activeMovType = 'ENTRADA';
     switchView('vista-movimiento');
@@ -316,14 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const note = document.getElementById('mov-nota').value.trim();
 
     if (!prodId) return showToast("Selecciona un producto.");
-    if (isNaN(qty) || qty <= 0) return showToast("Ingresa una cantidad mayor a 0.");
+    if (isNaN(qty) || qty <= 0) return showToast("Cantidad inválida.");
 
     const product = state.products.find(p => p.id === prodId);
     if (!product) return;
 
     if (activeMovType === 'SALIDA' && product.stock < qty) {
-      showToast(`Stock insuficiente (Disponible: ${product.stock})`);
-      return;
+      return showToast(`Stock insuficiente (Disponible: ${product.stock})`);
     }
 
     if (activeMovType === 'ENTRADA') product.stock += qty;
@@ -349,13 +443,12 @@ document.addEventListener('DOMContentLoaded', () => {
     switchView('vista-inventario');
   });
 
-  // Verificación Inicial de Autenticación
-  renderDashboard();
-  renderInventory();
-  setupMovementForm();
-  renderMovementsHistory();
-
+  // Verificación Inicial
   if (state.auth.isAuthenticated) {
+    renderDashboard();
+    renderInventory();
+    setupMovementForm();
+    renderMovementsHistory();
     switchView('vista-dashboard');
   } else {
     switchView('vista-login');
