@@ -1,6 +1,6 @@
 import '../styles/main.scss';
 
-const STORAGE_KEY = 'check_stock_app_state_v6';
+const STORAGE_KEY = 'check_stock_app_state_v7';
 
 const defaultState = {
   auth: {
@@ -24,7 +24,22 @@ const defaultState = {
   ]
 };
 
-let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+// Carga blindada desde localStorage con copia limpia de seguridad
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error('Error al leer localStorage:', e);
+    }
+  }
+  const initialState = JSON.parse(JSON.stringify(defaultState));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(initialState));
+  return initialState;
+}
+
+let state = loadState();
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -67,7 +82,7 @@ function showAuthForm(formId, subtitleText) {
   document.getElementById('auth-subtitle').textContent = subtitleText;
 }
 
-// RENDER DASHBOARD (Incluye Alertas)
+// RENDER DASHBOARD
 function renderDashboard() {
   if (!state.auth.isAuthenticated) return;
 
@@ -221,10 +236,17 @@ function renderMovementsHistory() {
   });
 }
 
+function refreshAllViews() {
+  renderDashboard();
+  renderInventory();
+  setupMovementForm();
+  renderMovementsHistory();
+}
+
 // LISTENERS Y CONFIGURACIÓN INICIAL
 document.addEventListener('DOMContentLoaded', () => {
 
-  // Transiciones de Auth Form Flow
+  // Transiciones Auth
   document.getElementById('go-to-register').addEventListener('click', () => {
     showAuthForm('form-register', 'Crear una nueva cuenta');
   });
@@ -253,11 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
       state.auth.user = foundUser ? foundUser.user : userVal;
       saveState();
 
-      renderDashboard();
-      renderInventory();
-      setupMovementForm();
-      renderMovementsHistory();
-
+      refreshAllViews();
       switchView('vista-dashboard');
       showToast(`¡Bienvenido, ${state.auth.user}!`);
     } else {
@@ -282,11 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.auth.user = user;
     saveState();
 
-    renderDashboard();
-    renderInventory();
-    setupMovementForm();
-    renderMovementsHistory();
-
+    refreshAllViews();
     switchView('vista-dashboard');
     showToast("Cuenta creada con éxito.");
   });
@@ -294,15 +308,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Submit Recuperar Clave
   document.getElementById('form-forgot').addEventListener('submit', (e) => {
     e.preventDefault();
-    const input = document.getElementById('forgot-input').value.trim();
-    if (!input) return;
-
     showToast("Instrucciones enviadas a tu correo.");
     document.getElementById('form-forgot').reset();
     showAuthForm('form-login', 'Sistema de Control de Inventario');
   });
 
-  // Logout
+  // Logout (Mantiene los datos en localStorage, solo quita la sesión)
   document.getElementById('btn-logout').addEventListener('click', () => {
     state.auth.isAuthenticated = false;
     state.auth.user = null;
@@ -311,14 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast("Sesión cerrada.");
   });
 
-  // Formulario de Nueva Alerta
+  // Nueva Alerta
   const alertForm = document.getElementById('form-nueva-alerta');
-  document.getElementById('btn-toggle-alert-form').addEventListener('click', () => {
-    alertForm.classList.remove('hidden');
-  });
-  document.getElementById('btn-cancel-alert').addEventListener('click', () => {
-    alertForm.classList.add('hidden');
-  });
+  document.getElementById('btn-toggle-alert-form').addEventListener('click', () => alertForm.classList.remove('hidden'));
+  document.getElementById('btn-cancel-alert').addEventListener('click', () => alertForm.classList.add('hidden'));
 
   alertForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -376,9 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     newProdForm.reset();
     newProdForm.classList.add('hidden');
-    renderInventory();
-    setupMovementForm();
-    renderDashboard();
+    refreshAllViews();
     showToast("¡Producto registrado!");
   });
 
@@ -433,22 +438,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     saveState();
-    setupMovementForm();
-    renderDashboard();
-    renderInventory();
-    renderMovementsHistory();
+    refreshAllViews();
 
     document.getElementById('form-movimiento').reset();
     showToast("¡Movimiento registrado!");
     switchView('vista-inventario');
   });
 
-  // Verificación Inicial
+  // Estado Inicial
   if (state.auth.isAuthenticated) {
-    renderDashboard();
-    renderInventory();
-    setupMovementForm();
-    renderMovementsHistory();
+    refreshAllViews();
     switchView('vista-dashboard');
   } else {
     switchView('vista-login');
