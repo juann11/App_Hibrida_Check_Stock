@@ -104,12 +104,21 @@
         <div id="mini-dashboard-stats" class="mini-dash-grid"></div>
       </section>
 
+      <!-- Acceso Rápido (Actualizado con data-target) -->
       <div class="section-title">Acceso Rápido</div>
       <div class="quick-access">
-        <button class="quick-btn" id="btn-quick-entrada"><span>📈</span><small>Entradas</small></button>
-        <button class="quick-btn" id="btn-quick-salida"><span>📉</span><small>Salidas</small></button>
-        <button class="quick-btn" id="btn-quick-inv"><span>📦</span><small>Inventario</small></button>
-        <button class="quick-btn" id="btn-quick-rep"><span>📊</span><small>Reportes</small></button>
+        <button class="quick-btn" id="btn-quick-entrada" data-target="vista-movimiento" data-type="ENTRADA">
+          <span>📈</span><small>Entradas</small>
+        </button>
+        <button class="quick-btn" id="btn-quick-salida" data-target="vista-movimiento" data-type="SALIDA">
+          <span>📉</span><small>Salidas</small>
+        </button>
+        <button class="quick-btn" id="btn-quick-inv" data-target="vista-inventario">
+          <span>📦</span><small>Inventario</small>
+        </button>
+        <button class="quick-btn" id="btn-quick-rep" data-target="vista-reportes">
+          <span>📊</span><small>Reportes</small>
+        </button>
       </div>
 
       <!-- Sección de Alertas -->
