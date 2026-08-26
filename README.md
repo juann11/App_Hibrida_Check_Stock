@@ -24,5 +24,5 @@ Sigue estos pasos para clonar, instalar y ejecutar el proyecto en tu entorno loc
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/juann11/App_Hibrida_Check_Stock.git](https://github.com/juann11/App_Hibrida_Check_Stock.git)
+   git clone [https://github.com/juann11/App_Hibrida_Check_Stock.git]
    cd App_hibrida

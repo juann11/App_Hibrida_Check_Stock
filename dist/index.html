@@ -2,88 +2,137 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Check Stock - App Híbrida</title>
-  <script type="module" crossorigin src="/assets/index-BhuQ1L7k.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-BDLTQ8tb.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Check Stock</title>
+  <script type="module" crossorigin src="/assets/index-Csyr52u9.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DqEo0HYl.css">
 </head>
 <body>
 
-  <!-- Barra de navegación fija -->
-  <nav class="navbar">
-    <div class="nav-brand">
-      <img src="./src/assets/logo.svg" alt="Logo">
-      <span>Check Stock</span>
-    </div>
-    <div class="nav-menu">
-      <button data-target="vista-home">Inicio</button>
-      <button data-target="vista-inventario">Inventario</button>
-      <button data-target="vista-reportes">Reportes</button>
-    </div>
-  </nav>
+  <!-- Toast de Notificaciones -->
+  <div id="toast-notification" class="toast hidden"></div>
 
-  <!-- Contenedor dinámico de vistas SPA -->
+  <!-- App Container (Full Viewport) -->
   <main class="app-container">
     
-    <!-- VISTA INICIO / DASHBOARD -->
-    <section class="view active" id="vista-home">
-      <h1>Panel de Control</h1>
-      <p>Resumen general del estado de inventario en tiempo real (Offline).</p>
-      
-      <div class="stats-grid">
-        <div class="card">
-          <h3>Total Productos</h3>
-          <p id="stat-total-products" class="stat-number">0</p>
+    <!-- 1. DASHBOARD -->
+    <section class="view active" id="vista-dashboard">
+      <header class="app-header">
+        <h2>Dashboard</h2>
+      </header>
+
+      <div class="stats-container">
+        <div class="stat-card">
+          <span class="stat-icon">📋</span>
+          <h3 id="dash-total-movs">0</h3>
+          <p>Movimientos</p>
         </div>
-        <div class="card">
-          <h3>Stock Acumulado</h3>
-          <p id="stat-total-stock" class="stat-number">0</p>
-        </div>
-        <div class="card alert-card">
-          <h3>Alertas Stock Bajo</h3>
-          <p id="stat-low-stock" class="stat-number">0</p>
+        <div class="stat-card">
+          <span class="stat-icon">📦</span>
+          <h3 id="dash-total-stock">0</h3>
+          <p>Stock Total</p>
         </div>
       </div>
+
+      <div class="section-title">Acceso Rápido</div>
+      <div class="quick-access">
+        <button class="quick-btn" id="btn-quick-entrada"><span>📈</span><small>Entradas</small></button>
+        <button class="quick-btn" id="btn-quick-salida"><span>📉</span><small>Salidas</small></button>
+        <button class="quick-btn" id="btn-quick-inv"><span>📦</span><small>Inventario</small></button>
+        <button class="quick-btn" id="btn-quick-rep"><span>📊</span><small>Reportes</small></button>
+      </div>
+
+      <div class="section-title">Alertas Recientes (<span id="alert-count">0</span>)</div>
+      <div id="alerts-list-container"></div>
     </section>
 
-    <!-- VISTA INVENTARIO -->
+    <!-- 2. INVENTARIO -->
     <section class="view" id="vista-inventario">
-      <h1>Gestión de Inventario</h1>
-      
-      <!-- Formulario para agregar productos -->
-      <form id="product-form" class="product-form">
-        <input type="text" id="prod-name" placeholder="Nombre del producto" required>
-        <input type="text" id="prod-category" placeholder="Categoría" required>
-        <input type="number" id="prod-stock" placeholder="Cantidad inicial" min="0" required>
-        <input type="number" id="prod-price" placeholder="Precio unitario" min="0" required>
-        <button type="submit" class="btn-primary">Agregar Producto</button>
+      <header class="app-header header-actions">
+        <h2>Inventario</h2>
+        <button class="btn-primary-sm" id="btn-toggle-new-product">+ Nuevo</button>
+      </header>
+
+      <!-- Formulario Desplegable para Nuevo Producto -->
+      <form id="form-nuevo-producto" class="card-form hidden">
+        <h4>Registrar Nuevo Producto</h4>
+        <input type="text" id="new-prod-name" placeholder="Nombre del Producto" required>
+        <div class="form-row">
+          <input type="text" id="new-prod-sku" placeholder="SKU / Código" required>
+          <input type="number" id="new-prod-stock" min="0" placeholder="Stock Inicial" required>
+        </div>
+        <input type="text" id="new-prod-loc" placeholder="Ubicación (Ej. Bodega A1)" required>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary full-btn">Guardar Producto</button>
+          <button type="button" class="btn-secondary full-btn" id="btn-cancel-product">Cancelar</button>
+        </div>
       </form>
 
-      <!-- Tabla dinámica de inventario -->
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Categoría</th>
-              <th>Stock</th>
-              <th>Precio</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="inventory-table-body">
-            <!-- Se llena dinámicamente con JavaScript -->
-          </tbody>
-        </table>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Buscar por nombre o SKU...">
       </div>
+
+      <div class="filter-pills" id="filter-pills">
+        <button class="pill active" data-filter="all">Total</button>
+        <button class="pill" data-filter="disponible">Disponible</button>
+        <button class="pill" data-filter="agotado">Agotado</button>
+      </div>
+
+      <div class="product-cards-list" id="inventory-cards-container"></div>
     </section>
 
-    <!-- VISTA REPORTES -->
-    <section class="view" id="vista-reportes">
-      <h1>Reportes y Estado Offline</h1>
-      <p>La aplicación opera de manera autónoma utilizando el almacenamiento interno del dispositivo (localStorage), garantizando disponibilidad sin conexión a internet.</p>
+    <!-- 3. NUEVO MOVIMIENTO -->
+    <section class="view" id="vista-movimiento">
+      <header class="app-header">
+        <h2>Nuevo Movimiento</h2>
+      </header>
+
+      <form id="form-movimiento" class="mov-form">
+        <div class="form-group">
+          <label for="mov-producto-select">Seleccionar Producto</label>
+          <select id="mov-producto-select" required></select>
+        </div>
+
+        <div class="section-title">Tipo De Movimiento</div>
+        <div class="mov-type-grid" id="mov-type-selector">
+          <button type="button" class="pill-type active" data-type="ENTRADA">+ ENTRADA</button>
+          <button type="button" class="pill-type" data-type="SALIDA">- SALIDA</button>
+        </div>
+
+        <div class="form-group">
+          <label for="mov-cantidad">Cantidad</label>
+          <input type="number" id="mov-cantidad" min="1" value="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="mov-nota">Motivo / Nota</label>
+          <textarea id="mov-nota" rows="3" placeholder="Ej. Recepción de lote o reubicación..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary full-btn">GUARDAR MOVIMIENTO</button>
+      </form>
     </section>
+
+    <!-- 4. REPORTES -->
+    <section class="view" id="vista-reportes">
+      <header class="app-header">
+        <h2>Reportes e Historial</h2>
+      </header>
+
+      <div class="section-title">Historial de Movimientos</div>
+      <div id="movements-history-container" class="history-list"></div>
+    </section>
+
   </main>
+
+  <!-- Navigation Bar -->
+  <nav class="bottom-navbar">
+    <button class="nav-icon-btn active" data-target="vista-dashboard" aria-label="Dashboard">🏠</button>
+    <button class="nav-icon-btn" data-target="vista-inventario" aria-label="Inventario">📦</button>
+    <button class="nav-icon-btn" data-target="vista-movimiento" aria-label="Movimientos">📋</button>
+    <button class="nav-icon-btn" data-target="vista-reportes" aria-label="Reportes">📊</button>
+  </nav>
 
 </body>
 </html>
