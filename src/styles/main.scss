@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables' as *;
 
 * {
   margin: 0;
@@ -16,7 +16,6 @@ body {
   overflow: hidden;
 }
 
-/* Toast System */
 .toast {
   position: fixed;
   top: 16px;
@@ -51,10 +50,72 @@ body {
   }
 }
 
+/* Header & Botón de Devolverse */
 .app-header {
   margin-bottom: 16px;
-  h2 { font-size: 1.5rem; font-weight: 700; color: #18181B; }
+  h2 { font-size: 1.4rem; font-weight: 700; color: #18181B; }
+  .user-badge { color: #71717A; font-size: 0.75rem; font-weight: 500; }
+  
   &.header-actions { display: flex; justify-content: space-between; align-items: center; }
+  &.header-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+}
+
+.btn-back {
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #18181B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:active { background: #F4F4F5; }
+}
+
+/* Pantalla de Login */
+#vista-login {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .login-card {
+    width: 100%;
+    max-width: 360px;
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 16px;
+    padding: 28px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  }
+
+  .login-brand {
+    text-align: center;
+    margin-bottom: 24px;
+    .brand-icon { font-size: 2.5rem; }
+    h1 { font-size: 1.5rem; font-weight: 800; color: #18181B; margin-top: 4px; }
+    p { font-size: 0.8rem; color: #71717A; }
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
 }
 
 .section-title {
@@ -66,7 +127,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Componentes de Interfaz */
 .stats-container {
   display: flex;
   gap: 12px;
@@ -135,7 +195,6 @@ body {
   }
 }
 
-/* Formularios y Modal Desplegable */
 .card-form {
   background: #FFFFFF;
   border: 1px solid #E4E4E7;
@@ -151,7 +210,7 @@ body {
   .form-row { display: flex; gap: 8px; }
   
   input {
-    font-size: 16px; /* Evita zoom automático en navegadores móviles */
+    font-size: 16px;
     padding: 10px;
     border: 1px solid #E4E4E7;
     border-radius: 8px;
@@ -216,24 +275,25 @@ body {
   }
 }
 
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  label { font-size: 0.85rem; font-weight: 600; color: #27272A; }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #E4E4E7;
+    border-radius: 8px;
+    font-size: 16px;
+    background: #FFF;
+  }
+}
+
 .mov-form {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    label { font-size: 0.85rem; font-weight: 600; color: #27272A; }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #E4E4E7;
-      border-radius: 8px;
-      font-size: 16px;
-      background: #FFF;
-    }
-  }
 }
 
 .mov-type-grid {
@@ -262,7 +322,6 @@ body {
   small { color: #71717A; font-size: 0.75rem; }
 }
 
-/* Botones Principales y Secundarios */
 .btn-primary-sm {
   background: #18181B;
   color: #FFF;
@@ -271,6 +330,17 @@ body {
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-secondary-sm {
+  background: #F4F4F5;
+  color: #18181B;
+  border: 1px solid #E4E4E7;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.75rem;
   cursor: pointer;
 }
 
@@ -296,7 +366,6 @@ body {
   cursor: pointer;
 }
 
-/* Bottom Navigation */
 .bottom-navbar {
   position: fixed;
   bottom: 0;
@@ -309,6 +378,8 @@ body {
   justify-content: space-around;
   align-items: center;
   z-index: 1000;
+
+  &.hidden { display: none; }
 
   .nav-icon-btn {
     background: transparent;

@@ -1,8 +1,12 @@
 import '../styles/main.scss';
 
-const STORAGE_KEY = 'check_stock_app_state_v3';
+const STORAGE_KEY = 'check_stock_app_state_v4';
 
 const defaultState = {
+  auth: {
+    isAuthenticated: false,
+    user: null
+  },
   products: [
     { id: '1', name: 'Cajas de Teclados', sku: '3422', stock: 120, location: 'Bodega L5' },
     { id: '2', name: 'Lectores de Código', sku: '1102', stock: 0, location: 'Bodega A1' },
@@ -23,7 +27,6 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// Sistema Toast para Retroalimentación
 function showToast(message) {
   const toast = document.getElementById('toast-notification');
   toast.textContent = message;
@@ -33,8 +36,16 @@ function showToast(message) {
   }, 2500);
 }
 
-// Router SPA
+// Control de vistas y barra inferior
 function switchView(targetId) {
+  const bottomNav = document.getElementById('bottom-nav');
+
+  if (targetId === 'vista-login') {
+    bottomNav.classList.add('hidden');
+  } else {
+    bottomNav.classList.remove('hidden');
+  }
+
   document.querySelectorAll('.app-container .view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.bottom-navbar .nav-icon-btn').forEach(b => b.classList.remove('active'));
 
@@ -45,12 +56,16 @@ function switchView(targetId) {
   if (activeNavBtn) activeNavBtn.classList.add('active');
 }
 
-// Render Dashboard
+// Dashboard
 function renderDashboard() {
   const totalStock = state.products.reduce((acc, p) => acc + Number(p.stock), 0);
   document.getElementById('dash-total-stock').textContent = totalStock;
   document.getElementById('dash-total-movs').textContent = state.movements.length;
   document.getElementById('alert-count').textContent = state.alerts.length;
+
+  if (state.auth.user) {
+    document.getElementById('user-display-name').textContent = `Usuario: ${state.auth.user}`;
+  }
 
   const alertsContainer = document.getElementById('alerts-list-container');
   alertsContainer.innerHTML = '';
@@ -88,7 +103,7 @@ function renderDashboard() {
   });
 }
 
-// Render Inventario y Nuevo Producto
+// Inventario
 let currentFilter = 'all';
 
 function renderInventory() {
@@ -144,7 +159,7 @@ function renderInventory() {
   });
 }
 
-// Selectores de Movimiento e Historial
+// Formulario de Movimiento e Historial
 function setupMovementForm() {
   const select = document.getElementById('mov-producto-select');
   select.innerHTML = '';
@@ -187,12 +202,41 @@ function renderMovementsHistory() {
   });
 }
 
-// Event Listeners Globales
+// Eventos e Inicialización
 document.addEventListener('DOMContentLoaded', () => {
-  // Navegación
+
+  // Login Submit
+  document.getElementById('form-login').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value.trim();
+
+    if (user && pass) {
+      state.auth.isAuthenticated = true;
+      state.auth.user = user;
+      saveState();
+
+      renderDashboard();
+      switchView('vista-dashboard');
+      showToast(`¡Bienvenido, ${user}!`);
+    } else {
+      showToast("Ingresa credenciales válidas.");
+    }
+  });
+
+  // Logout
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    state.auth.isAuthenticated = false;
+    state.auth.user = null;
+    saveState();
+    switchView('vista-login');
+    showToast("Sesión cerrada.");
+  });
+
+  // Delegación de Navegación SPA y Botones de Retorno (←)
   document.body.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-target]');
-    if (btn) {
+    if (btn && state.auth.isAuthenticated) {
       e.preventDefault();
       switchView(btn.getAttribute('data-target'));
     }
@@ -211,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Buscador
   document.getElementById('search-input').addEventListener('input', renderInventory);
 
-  // Toggle Formulario Nuevo Producto
+  // Formulario Nuevo Producto
   const newProdForm = document.getElementById('form-nuevo-producto');
   document.getElementById('btn-toggle-new-product').addEventListener('click', () => {
     newProdForm.classList.remove('hidden');
@@ -220,7 +264,6 @@ document.addEventListener('DOMContentLoaded', () => {
     newProdForm.classList.add('hidden');
   });
 
-  // Submit Nuevo Producto
   newProdForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('new-prod-name').value.trim();
@@ -233,8 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const newProd = { id: 'p_' + Date.now(), name, sku, stock, location };
-    state.products.push(newProd);
+    state.products.push({ id: 'p_' + Date.now(), name, sku, stock, location });
     saveState();
 
     newProdForm.reset();
@@ -254,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Accesos Rápidos Dashboard
+  // accesos Rápidos
   document.getElementById('btn-quick-entrada').addEventListener('click', () => {
     activeMovType = 'ENTRADA';
     switchView('vista-movimiento');
@@ -273,14 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const qty = Number(document.getElementById('mov-cantidad').value);
     const note = document.getElementById('mov-nota').value.trim();
 
-    if (!prodId) {
-      showToast("Debes seleccionar un producto.");
-      return;
-    }
-    if (isNaN(qty) || qty <= 0) {
-      showToast("Ingresa una cantidad válida mayor a 0.");
-      return;
-    }
+    if (!prodId) return showToast("Selecciona un producto.");
+    if (isNaN(qty) || qty <= 0) return showToast("Ingresa una cantidad mayor a 0.");
 
     const product = state.products.find(p => p.id === prodId);
     if (!product) return;
@@ -309,13 +345,19 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMovementsHistory();
 
     document.getElementById('form-movimiento').reset();
-    showToast("¡Movimiento registrado correctamente!");
+    showToast("¡Movimiento registrado!");
     switchView('vista-inventario');
   });
 
-  // Inicialización
+  // Verificación Inicial de Autenticación
   renderDashboard();
   renderInventory();
   setupMovementForm();
   renderMovementsHistory();
+
+  if (state.auth.isAuthenticated) {
+    switchView('vista-dashboard');
+  } else {
+    switchView('vista-login');
+  }
 });
