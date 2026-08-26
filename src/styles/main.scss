@@ -293,9 +293,11 @@ body {
   }
 }
 
+/* Escala del logo*/
 .brand-logo-img {
-  width: 56px;
-  height: 56px;
+  width: 120px; 
+  height: auto;
+  max-width: 100%;
   object-fit: contain;
   margin-bottom: 8px;
 }
