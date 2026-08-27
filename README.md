@@ -55,11 +55,11 @@ git clone https://github.com/juann11/App_Hibrida_Check_Stock.git
 
 2. Compilar SASS (opcional, si deseas modificar estilos):
 
-Bash
 sass --watch src/scss/styles.scss src/css/styles.css
 
 3. Ejecutar la aplicación:
 Abre el archivo index.html directamente en cualquier navegador web o mediante una extensión como Live Server en Visual Studio Code.
+
 
 💾 Respaldo y Migración de Datos
 Para evitar la pérdida de información al borrar la caché del navegador:
