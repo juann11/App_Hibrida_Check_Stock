@@ -88,3 +88,39 @@ export function importBackup(file, callback) {
   };
   reader.readAsText(file);
 }
+
+// Exportar Movimientos a CSV (con compatibilidad de caracteres para Excel)
+export function exportMovementsToCSV(filteredMovements) {
+  const movs = filteredMovements || state.movements;
+  
+  if (!movs || movs.length === 0) {
+    return false;
+  }
+
+  const headers = ['ID', 'Producto', 'Tipo', 'Cantidad', 'Fecha', 'Nota'];
+  
+  const rows = movs.map(m => [
+    `"${m.id}"`,
+    `"${m.productName.replace(/"/g, '""')}"`,
+    `"${m.type}"`,
+    m.qty,
+    `"${new Date(m.date).toLocaleString()}"`,
+    `"${(m.note || '').replace(/"/g, '""')}"`
+  ]);
+
+  const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  
+  // Agregar UTF-8 BOM para que Microsoft Excel lea correctamente tildes y caracteres especiales
+  const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  
+  const downloadLink = document.createElement('a');
+  downloadLink.href = url;
+  downloadLink.setAttribute('download', `reporte_movimientos_${new Date().toISOString().slice(0, 10)}.csv`);
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(url);
+  
+  return true;
+}

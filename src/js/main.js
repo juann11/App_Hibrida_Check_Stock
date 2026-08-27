@@ -1,6 +1,6 @@
 import '../styles/main.scss';
 
-import { state, checkLowStockAlerts, exportBackup, importBackup } from './modules/storage.js';
+import { state, checkLowStockAlerts, exportBackup, importBackup, saveState } from './modules/storage.js';
 import { loginUser, registerUser, logoutUser } from './modules/auth.js';
 import { addProduct, recordMovement } from './modules/inventory.js';
 import { exportMovementsCSV } from './modules/reports.js';
@@ -72,12 +72,22 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast("Sesión cerrada.");
   });
 
-  // Navegación
+  // Navegación Global y Accesos Rápidos
   document.body.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-target]');
     if (btn) {
       e.preventDefault();
-      switchView(btn.getAttribute('data-target'));
+      const targetView = btn.getAttribute('data-target');
+      switchView(targetView);
+
+      // Si el botón contiene tipo de movimiento (Accesos Rápidos de Entrada/Salida)
+      const movType = btn.getAttribute('data-type');
+      if (movType) {
+        activeMovType = movType;
+        document.querySelectorAll('#mov-type-selector .pill-type').forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-type') === movType);
+        });
+      }
     }
   });
 
@@ -158,6 +168,29 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       showToast(res.message);
     }
+  });
+
+  // Formulario Crear Alerta Manual
+  const formAlerta = document.getElementById('form-nueva-alerta');
+  document.getElementById('btn-toggle-alert-form')?.addEventListener('click', () => formAlerta?.classList.remove('hidden'));
+  document.getElementById('btn-cancel-alert')?.addEventListener('click', () => formAlerta?.classList.add('hidden'));
+
+  formAlerta?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = document.getElementById('new-alert-title').value.trim();
+    const text = document.getElementById('new-alert-text').value.trim();
+
+    state.alerts.unshift({
+      id: `alert_${Date.now()}`,
+      title: title,
+      text: text
+    });
+
+    saveState();
+    formAlerta.reset();
+    formAlerta.classList.add('hidden');
+    refreshAllViews();
+    showToast("Alerta creada correctamente.");
   });
 
   // Filtro por Fecha de Reportes y Exportación CSV

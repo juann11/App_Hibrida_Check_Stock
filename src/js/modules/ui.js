@@ -10,6 +10,17 @@ export function showToast(message) {
   setTimeout(() => toast.classList.add('hidden'), 2500);
 }
 
+// Generador auxiliar de Empty States Ilustrados
+function getEmptyStateHTML(icon, title, description) {
+  return `
+    <div class="empty-state-card" style="text-align: center; padding: 25px 15px; color: #71717A;">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">${icon}</div>
+      <h5 style="font-size: 0.95rem; font-weight: 600; margin: 0 0 4px 0; color: #E4E4E7;">${title}</h5>
+      <p style="font-size: 0.8rem; margin: 0;">${description}</p>
+    </div>
+  `;
+}
+
 export function switchView(targetId) {
   const loginOverlay = document.getElementById('vista-login');
 
@@ -36,7 +47,9 @@ export function renderDashboard() {
   if (!state.auth.isAuthenticated) return;
 
   const totalStock = state.products.reduce((acc, p) => acc + Number(p.stock), 0);
-  const lowStockCount = state.products.filter(p => p.stock <= 15).length;
+  const outOfStockCount = state.products.filter(p => Number(p.stock) === 0).length;
+  const lowStockCount = state.products.filter(p => Number(p.stock) > 0 && Number(p.stock) <= 15).length;
+  const optimalStockCount = state.products.filter(p => Number(p.stock) > 15).length;
 
   const elStock = document.getElementById('dash-total-stock');
   const elMovs = document.getElementById('dash-total-movs');
@@ -48,7 +61,7 @@ export function renderDashboard() {
   if (elAlerts) elAlerts.textContent = state.alerts.length;
   if (elUser && state.auth.user) elUser.textContent = `Usuario: ${state.auth.user}`;
 
-  // Mini Dashboard de Métricas
+  // Mini Dashboard de Métricas (Cuadrícula 2x2 equilibrada)
   const miniDashContainer = document.getElementById('mini-dashboard-stats');
   if (miniDashContainer) {
     miniDashContainer.innerHTML = `
@@ -60,6 +73,14 @@ export function renderDashboard() {
         <span>⚠️ Stock Crítico (≤15)</span>
         <strong>${lowStockCount}</strong>
       </div>
+      <div class="mini-stat-card ${outOfStockCount > 0 ? 'danger' : ''}">
+        <span>🚫 Agotados</span>
+        <strong>${outOfStockCount}</strong>
+      </div>
+      <div class="mini-stat-card success">
+        <span>✅ En Regla</span>
+        <strong>${optimalStockCount}</strong>
+      </div>
     `;
   }
 
@@ -68,7 +89,7 @@ export function renderDashboard() {
   if (alertsContainer) {
     alertsContainer.innerHTML = '';
     if (state.alerts.length === 0) {
-      alertsContainer.innerHTML = '<p style="color:#71717A; font-size:0.85rem;">No hay alertas pendientes.</p>';
+      alertsContainer.innerHTML = getEmptyStateHTML('🔔', 'Sin alertas pendientes', 'Todo está al día en tu inventario.');
     } else {
       state.alerts.forEach(alert => {
         const alertDiv = document.createElement('div');
@@ -96,6 +117,13 @@ export function renderDashboard() {
           showToast("Alerta descartada.");
         });
       });
+
+      alertsContainer.querySelectorAll('.btn-view').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.target.getAttribute('data-target');
+          switchView(target);
+        });
+      });
     }
   }
 }
@@ -109,9 +137,10 @@ export function renderInventory(currentFilter = 'all') {
 
   const filtered = state.products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchVal) || p.sku.toLowerCase().includes(searchVal);
-    if (currentFilter === 'disponible') return matchesSearch && p.stock > 0;
-    if (currentFilter === 'agotado') return matchesSearch && p.stock === 0;
-    if (currentFilter === 'critico') return matchesSearch && p.stock <= 15;
+    const st = Number(p.stock);
+    if (currentFilter === 'disponible') return matchesSearch && st > 15;
+    if (currentFilter === 'critico') return matchesSearch && st > 0 && st <= 15;
+    if (currentFilter === 'agotado') return matchesSearch && st === 0;
     return matchesSearch;
   });
 
@@ -119,13 +148,14 @@ export function renderInventory(currentFilter = 'all') {
   container.innerHTML = '';
 
   if (filtered.length === 0) {
-    container.innerHTML = '<p style="color:#71717A; font-size:0.85rem; padding:10px 0;">No se encontraron productos.</p>';
+    container.innerHTML = getEmptyStateHTML('🔍', 'No se encontraron productos', 'Intenta con otro término o ajusta el filtro actual.');
     return;
   }
 
   filtered.forEach(p => {
-    const isAvailable = p.stock > 0;
-    const isLow = p.stock <= 15;
+    const st = Number(p.stock);
+    const isAvailable = st > 0;
+    const isLow = st <= 15;
     const card = document.createElement('div');
     card.className = `product-card-item ${isLow ? 'card-low-stock' : ''}`;
     card.innerHTML = `
@@ -136,7 +166,7 @@ export function renderInventory(currentFilter = 'all') {
       <p class="card-desc">Ubicación: ${p.location}</p>
       <div class="card-bottom">
         <span class="stock-badge ${isLow ? 'out' : isAvailable ? 'available' : 'out'}">
-          ${isAvailable ? `Disponible: ${p.stock} UND` : 'AGOTADO'}
+          ${isAvailable ? `Disponible: ${st} UND` : 'AGOTADO'}
         </span>
         <button class="btn-delete-prod" data-id="${p.id}" title="Eliminar producto">🗑️</button>
       </div>
@@ -166,7 +196,7 @@ export function renderMovementsHistory(filterType = 'todos') {
   const filteredMovs = getFilteredMovements(filterType);
 
   if (filteredMovs.length === 0) {
-    container.innerHTML = '<p style="color:#71717A; font-size:0.85rem;">No hay movimientos en este periodo.</p>';
+    container.innerHTML = getEmptyStateHTML('📊', 'Sin movimientos en este período', 'No se registraron entradas o salidas dentro de esta fecha.');
     return;
   }
 

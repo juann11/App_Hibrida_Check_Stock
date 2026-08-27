@@ -98,13 +98,13 @@
         </div>
       </div>
 
-      <!-- Mini Dashboard (Métricas Avanzadas) -->
+      <!-- Mini Dashboard -->
       <section class="mini-dashboard-section">
         <div class="section-title">Resumen General</div>
         <div id="mini-dashboard-stats" class="mini-dash-grid"></div>
       </section>
 
-      <!-- Acceso Rápido (Actualizado con data-target) -->
+      <!-- Acceso Rápido -->
       <div class="section-title">Acceso Rápido</div>
       <div class="quick-access">
         <button class="quick-btn" id="btn-quick-entrada" data-target="vista-movimiento" data-type="ENTRADA">
@@ -140,18 +140,25 @@
 
       <div id="alerts-list-container"></div>
 
-      <!-- Sección de Respaldo y Seguridad (Backup/Restore JSON) -->
-      <section class="backup-section">
-        <div class="section-title">Respaldo y Seguridad</div>
-        <div class="backup-buttons">
-          <button id="btn-export-backup" class="btn-secondary">📥 Exportar Backup (.json)</button>
-          <label for="input-import-backup" class="btn-secondary custom-file-upload">
-            📤 Importar Backup (.json)
-          </label>
-          <input type="file" id="input-import-backup" accept=".json" style="display:none;" />
-        </div>
-      </section>
-    </section>
+<!-- Sección de Respaldo y Seguridad Integrada -->
+<section class="backup-section">
+  <div class="section-title">RESPALDO Y SEGURIDAD</div>
+  <div class="backup-card">
+    <p class="backup-desc">Guarda una copia de tus datos o restaura la información guardada.</p>
+    <div class="backup-actions">
+      <button id="btn-export-backup" class="btn-backup-action export">
+        <span class="btn-icon">📥</span>
+        <span>Exportar Backup</span>
+      </button>
+
+      <label for="input-import-backup" class="btn-backup-action import">
+        <span class="btn-icon">📤</span>
+        <span>Importar Backup</span>
+      </label>
+      <input type="file" id="input-import-backup" accept=".json" class="hidden-file-input" style="display:none;" />
+    </div>
+  </div>
+</section>
 
     <!-- 2. INVENTARIO -->
     <section class="view" id="vista-inventario">
@@ -238,7 +245,6 @@
 
       <div class="section-title">Historial de Movimientos</div>
       
-      <!-- Filtros por Fecha y Botón de Exportación CSV -->
       <div class="report-controls">
         <div id="report-date-filters" class="pills-container">
           <button class="pill-report active" data-period="todos">Todos</button>
