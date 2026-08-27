@@ -46,22 +46,35 @@ export function switchView(targetId) {
 export function renderDashboard() {
   if (!state.auth.isAuthenticated) return;
 
-  const totalStock = state.products.reduce((acc, p) => acc + Number(p.stock), 0);
-  const outOfStockCount = state.products.filter(p => Number(p.stock) === 0).length;
-  const lowStockCount = state.products.filter(p => Number(p.stock) > 0 && Number(p.stock) <= 15).length;
-  const optimalStockCount = state.products.filter(p => Number(p.stock) > 15).length;
+  // 1. Un solo recorrido para calcular todas las métricas de productos
+  const { totalStock, outOfStockCount, lowStockCount, optimalStockCount } = state.products.reduce(
+    (acc, p) => {
+      const stock = Number(p.stock) || 0;
+      acc.totalStock += stock;
 
-  const elStock = document.getElementById('dash-total-stock');
-  const elMovs = document.getElementById('dash-total-movs');
-  const elAlerts = document.getElementById('alert-count');
-  const elUser = document.getElementById('user-display-name');
+      if (stock === 0) acc.outOfStockCount++;
+      else if (stock <= 15) acc.lowStockCount++;
+      else acc.optimalStockCount++;
 
-  if (elStock) elStock.textContent = totalStock;
-  if (elMovs) elMovs.textContent = state.movements.length;
-  if (elAlerts) elAlerts.textContent = state.alerts.length;
-  if (elUser && state.auth.user) elUser.textContent = `Usuario: ${state.auth.user}`;
+      return acc;
+    },
+    { totalStock: 0, outOfStockCount: 0, lowStockCount: 0, optimalStockCount: 0 }
+  );
 
-  // Mini Dashboard de Métricas (Cuadrícula 2x2 equilibrada)
+  // 2. Actualización rápida de elementos de cabecera
+  const elements = {
+    'dash-total-stock': totalStock,
+    'dash-total-movs': state.movements.length,
+    'alert-count': state.alerts.length,
+    'user-display-name': state.auth.user ? `Usuario: ${state.auth.user}` : null
+  };
+
+  Object.entries(elements).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el && val !== null) el.textContent = val;
+  });
+
+  // 3. Mini Dashboard de Métricas
   const miniDashContainer = document.getElementById('mini-dashboard-stats');
   if (miniDashContainer) {
     miniDashContainer.innerHTML = `
@@ -84,48 +97,56 @@ export function renderDashboard() {
     `;
   }
 
-  // Alertas
+  // 4. Renderizado optimizado de Alertas
   const alertsContainer = document.getElementById('alerts-list-container');
-  if (alertsContainer) {
-    alertsContainer.innerHTML = '';
-    if (state.alerts.length === 0) {
-      alertsContainer.innerHTML = getEmptyStateHTML('🔔', 'Sin alertas pendientes', 'Todo está al día en tu inventario.');
-    } else {
-      state.alerts.forEach(alert => {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert-box';
-        alertDiv.innerHTML = `
-          <div class="alert-header">
-            <span><strong>${alert.title}</strong></span>
-            <span class="close-x" data-id="${alert.id}">✕</span>
-          </div>
-          <p>${alert.text}</p>
-          <div class="alert-actions">
-            <button class="btn-dismiss" data-id="${alert.id}">Aceptar</button>
-            <button class="btn-view" data-target="vista-inventario">Ver Inventario</button>
-          </div>
-        `;
-        alertsContainer.appendChild(alertDiv);
-      });
+  if (!alertsContainer) return;
 
-      alertsContainer.querySelectorAll('.close-x, .btn-dismiss').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const alertId = e.target.getAttribute('data-id');
-          state.alerts = state.alerts.filter(a => a.id !== alertId);
-          saveState();
-          renderDashboard();
-          showToast("Alerta descartada.");
-        });
-      });
+  alertsContainer.innerHTML = '';
 
-      alertsContainer.querySelectorAll('.btn-view').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const target = e.target.getAttribute('data-target');
-          switchView(target);
-        });
-      });
-    }
+  if (state.alerts.length === 0) {
+    alertsContainer.innerHTML = getEmptyStateHTML('🔔', 'Sin alertas pendientes', 'Todo está al día en tu inventario.');
+    return;
   }
+
+  const fragment = document.createDocumentFragment();
+
+  state.alerts.forEach(alert => {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert-box';
+    alertDiv.innerHTML = `
+      <div class="alert-header">
+        <span><strong>${alert.title}</strong></span>
+        <button type="button" class="close-x" data-id="${alert.id}" aria-label="Cerrar">✕</button>
+      </div>
+      <p>${alert.text}</p>
+      <div class="alert-actions">
+        <button type="button" class="btn-dismiss" data-id="${alert.id}">Aceptar</button>
+        <button type="button" class="btn-view" data-target="vista-inventario">Ver Inventario</button>
+      </div>
+    `;
+    fragment.appendChild(alertDiv);
+  });
+
+  alertsContainer.appendChild(fragment);
+
+  // 5. Delegación de Eventos (Un solo Listener para todo el contenedor)
+  alertsContainer.onclick = (e) => {
+    const dismissBtn = e.target.closest('.close-x, .btn-dismiss');
+    if (dismissBtn) {
+      const alertId = dismissBtn.getAttribute('data-id');
+      state.alerts = state.alerts.filter(a => a.id !== alertId);
+      saveState();
+      renderDashboard();
+      showToast("Alerta descartada.");
+      return;
+    }
+
+    const viewBtn = e.target.closest('.btn-view');
+    if (viewBtn) {
+      const target = viewBtn.getAttribute('data-target');
+      switchView(target);
+    }
+  };
 }
 
 export function renderInventory(currentFilter = 'all') {

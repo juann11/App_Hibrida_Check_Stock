@@ -72,15 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast("Sesión cerrada.");
   });
 
-  // Navegación Global y Accesos Rápidos
+// Navegación Global y Accesos Rápidos
   document.body.addEventListener('click', (e) => {
+    // Si hace clic en los botones de backup, dejamos que sigan su curso
+    if (e.target.closest('#btn-export-backup') || e.target.closest('label[for="input-import-backup"]')) {
+      return;
+    }
+
     const btn = e.target.closest('[data-target]');
     if (btn) {
       e.preventDefault();
       const targetView = btn.getAttribute('data-target');
       switchView(targetView);
 
-      // Si el botón contiene tipo de movimiento (Accesos Rápidos de Entrada/Salida)
       const movType = btn.getAttribute('data-type');
       if (movType) {
         activeMovType = movType;

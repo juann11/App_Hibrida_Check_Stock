@@ -535,10 +535,6 @@ body {
   border-left: 4px solid #eab308 !important;
 }
 
-/* ==========================================
-   NUEVAS MEJORAS: DASHBOARD Y RESPALDO
-   ========================================== */
-
 /* --- Resumen General (Grid 2x2 Simétrico) --- */
 #mini-dashboard-stats {
   display: grid;
@@ -568,20 +564,12 @@ body {
     margin-top: 6px;
   }
 
-  &.warning {
-    border-left: 4px solid #F59E0B;
-  }
-
-  &.danger {
-    border-left: 4px solid #EF4444;
-  }
-
-  &.success {
-    border-left: 4px solid #10B981;
-  }
+  &.warning { border-left: 4px solid #F59E0B; }
+  &.danger { border-left: 4px solid #EF4444; }
+  &.success { border-left: 4px solid #10B981; }
 }
 
-/* --- Respaldo y Seguridad Estilizado --- */
+/* --- Respaldo y Seguridad --- */
 .backup-section {
   margin-top: 24px;
   margin-bottom: 30px;
