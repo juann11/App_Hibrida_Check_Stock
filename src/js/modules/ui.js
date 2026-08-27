@@ -47,7 +47,7 @@ export function switchView(targetId) {
   // 4. Activar botón correspondiente en la barra inferior
   const navButtons = document.querySelectorAll('.bottom-navbar .nav-icon-btn');
   navButtons.forEach(btn => btn.classList.remove('active'));
-  
+
   const activeBtn = document.querySelector(`.bottom-navbar [data-target="${targetId}"]`);
   if (activeBtn) {
     activeBtn.classList.add('active');
