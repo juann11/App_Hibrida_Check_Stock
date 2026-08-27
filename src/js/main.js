@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const res = loginUser(userVal, passVal);
     if (res.success) {
+      document.body.classList.remove('not-authenticated');
       refreshAllViews();
       switchView('vista-dashboard');
       showToast(`¡Bienvenido, ${res.user}!`);
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const res = registerUser(user, email, pass);
     if (res.success) {
+      document.body.classList.remove('not-authenticated');
       refreshAllViews();
       switchView('vista-dashboard');
       showToast("Cuenta creada con éxito.");
@@ -68,13 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Logout
   document.getElementById('btn-logout')?.addEventListener('click', () => {
     logoutUser();
+    document.body.classList.add('not-authenticated');
     switchView('vista-login');
     showToast("Sesión cerrada.");
   });
 
-// Navegación Global y Accesos Rápidos
+  // Navegación Global y Accesos Rápidos
   document.body.addEventListener('click', (e) => {
-    // Si hace clic en los botones de backup, dejamos que sigan su curso
     if (e.target.closest('#btn-export-backup') || e.target.closest('label[for="input-import-backup"]')) {
       return;
     }
@@ -218,9 +220,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Estado Inicial
   if (state.auth.isAuthenticated) {
+    document.body.classList.remove('not-authenticated');
     refreshAllViews();
     switchView('vista-dashboard');
   } else {
+    document.body.classList.add('not-authenticated');
     switchView('vista-login');
   }
 });

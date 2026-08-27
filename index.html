@@ -10,7 +10,7 @@
   <!-- Toast de Notificaciones -->
   <div id="toast-notification" class="toast hidden"></div>
 
-  <!-- PANTALLA DE AUTH (Full Overlay Bloqueante) -->
+  <!-- PANTALLA DE AUTH -->
   <section id="vista-login" class="login-overlay">
     <div class="login-card">
       <div class="login-brand">
@@ -71,11 +71,11 @@
     </div>
   </section>
 
-  <!-- APP PRINCIPAL (Protegida) -->
+  <!-- APP PRINCIPAL -->
   <main class="app-container" id="app-main-content">
     
     <!-- 1. DASHBOARD -->
-    <section class="view" id="vista-dashboard">
+    <section class="view active" id="vista-dashboard">
       <header class="app-header header-actions">
         <div>
           <h2>Dashboard</h2>
@@ -84,7 +84,6 @@
         <button class="btn-secondary-sm" id="btn-logout" title="Cerrar Sesión">🚪 Salir</button>
       </header>
 
-      <!-- Tarjetas de Métricas Principales -->
       <div class="stats-container">
         <div class="stat-card">
           <span class="stat-icon">📋</span>
@@ -98,19 +97,17 @@
         </div>
       </div>
 
-      <!-- Mini Dashboard -->
       <section class="mini-dashboard-section">
         <div class="section-title">Resumen General</div>
         <div id="mini-dashboard-stats" class="mini-dash-grid"></div>
       </section>
 
-      <!-- Acceso Rápido -->
       <div class="section-title">Acceso Rápido</div>
       <div class="quick-access">
-        <button class="quick-btn" id="btn-quick-entrada" data-target="vista-movimiento" data-type="ENTRADA">
+        <button class="quick-btn" id="btn-quick-entrada" data-target="vista-movimientos" data-type="ENTRADA">
           <span>📈</span><small>Entradas</small>
         </button>
-        <button class="quick-btn" id="btn-quick-salida" data-target="vista-movimiento" data-type="SALIDA">
+        <button class="quick-btn" id="btn-quick-salida" data-target="vista-movimientos" data-type="SALIDA">
           <span>📉</span><small>Salidas</small>
         </button>
         <button class="quick-btn" id="btn-quick-inv" data-target="vista-inventario">
@@ -121,13 +118,11 @@
         </button>
       </div>
 
-      <!-- Sección de Alertas -->
       <div class="section-header-inline">
         <div class="section-title">Alertas Recientes (<span id="alert-count">0</span>)</div>
         <button class="btn-primary-sm" id="btn-toggle-alert-form">+ Nueva Alerta</button>
       </div>
 
-      <!-- Formulario Crear Alerta -->
       <form id="form-nueva-alerta" class="card-form hidden">
         <h4>Crear Nueva Alerta</h4>
         <input type="text" id="new-alert-title" placeholder="Título de la alerta (Ej. Revisión stock)" required>
@@ -140,27 +135,28 @@
 
       <div id="alerts-list-container"></div>
 
-<section class="backup-section">
-  <div class="section-title">RESPALDO Y SEGURIDAD</div>
-  <div class="backup-card">
-    <p class="backup-desc">Guarda una copia de tus datos o restaura la información guardada.</p>
-    <div class="backup-actions">
-      <button id="btn-export-backup" type="button" class="btn-backup-action export">
-        <span class="btn-icon">📥</span>
-        <span>Exportar Backup</span>
-      </button>
+      <section class="backup-section">
+        <div class="section-title">RESPALDO Y SEGURIDAD</div>
+        <div class="backup-card">
+          <p class="backup-desc">Guarda una copia de tus datos o restaura la información guardada.</p>
+          <div class="backup-actions">
+            <button id="btn-export-backup" type="button" class="btn-backup-action export">
+              <span class="btn-icon">📥</span>
+              <span>Exportar Backup</span>
+            </button>
 
-      <label for="input-import-backup" class="btn-backup-action import">
-        <span class="btn-icon">📤</span>
-        <span>Importar Backup</span>
-      </label>
-      <input type="file" id="input-import-backup" accept=".json" style="display: none;" />
-    </div>
-  </div>
-</section>
+            <label for="input-import-backup" class="btn-backup-action import">
+              <span class="btn-icon">📤</span>
+              <span>Importar Backup</span>
+            </label>
+            <input type="file" id="input-import-backup" accept=".json" style="display: none;" />
+          </div>
+        </div>
+      </section>
+    </section>
 
     <!-- 2. INVENTARIO -->
-    <section class="view" id="vista-inventario">
+    <section class="view hidden" id="vista-inventario">
       <header class="app-header header-nav">
         <div class="header-left">
           <button class="btn-back" data-target="vista-dashboard" aria-label="Volver">←</button>
@@ -199,7 +195,7 @@
     </section>
 
     <!-- 3. NUEVO MOVIMIENTO -->
-    <section class="view" id="vista-movimiento">
+    <section class="view hidden" id="vista-movimientos">
       <header class="app-header header-nav">
         <div class="header-left">
           <button class="btn-back" data-target="vista-dashboard" aria-label="Volver">←</button>
@@ -234,7 +230,7 @@
     </section>
 
     <!-- 4. REPORTES -->
-    <section class="view" id="vista-reportes">
+    <section class="view hidden" id="vista-reportes">
       <header class="app-header header-nav">
         <div class="header-left">
           <button class="btn-back" data-target="vista-dashboard" aria-label="Volver">←</button>
@@ -269,7 +265,7 @@
       <span class="nav-icon">📦</span>
       <span class="nav-label">Inventario</span>
     </button>
-    <button class="nav-icon-btn" data-target="vista-movimiento">
+    <button class="nav-icon-btn" data-target="vista-movimientos">
       <span class="nav-icon">📋</span>
       <span class="nav-label">Movimientos</span>
     </button>

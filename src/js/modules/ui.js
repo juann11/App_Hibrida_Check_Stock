@@ -22,25 +22,36 @@ function getEmptyStateHTML(icon, title, description) {
 }
 
 export function switchView(targetId) {
-  const loginOverlay = document.getElementById('vista-login');
-
-  if (!state.auth.isAuthenticated) {
-    document.body.classList.add('not-authenticated');
-    if (loginOverlay) loginOverlay.classList.remove('hidden');
-    return;
+  // 1. Asegurar que el contenedor principal esté VISIBLE siempre
+  const mainContent = document.getElementById('app-main-content');
+  if (mainContent) {
+    mainContent.style.display = 'block';
   }
 
-  document.body.classList.remove('not-authenticated');
-  if (loginOverlay) loginOverlay.classList.add('hidden');
+  // 2. Ocultar todas las vistas
+  const views = document.querySelectorAll('.app-container > .view');
+  views.forEach(view => {
+    view.classList.remove('active');
+    view.classList.add('hidden');
+    view.style.display = 'none'; // Forzado directo por JS
+  });
 
-  document.querySelectorAll('.app-container .view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.bottom-navbar .nav-icon-btn').forEach(b => b.classList.remove('active'));
-
+  // 3. Mostrar la vista seleccionada
   const targetView = document.getElementById(targetId);
-  if (targetView) targetView.classList.add('active');
+  if (targetView) {
+    targetView.classList.remove('hidden');
+    targetView.classList.add('active');
+    targetView.style.display = 'block'; // Forzado directo por JS
+  }
 
-  const activeNavBtn = document.querySelector(`.bottom-navbar [data-target="${targetId}"]`);
-  if (activeNavBtn) activeNavBtn.classList.add('active');
+  // 4. Activar botón correspondiente en la barra inferior
+  const navButtons = document.querySelectorAll('.bottom-navbar .nav-icon-btn');
+  navButtons.forEach(btn => btn.classList.remove('active'));
+  
+  const activeBtn = document.querySelector(`.bottom-navbar [data-target="${targetId}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+  }
 }
 
 export function renderDashboard() {
@@ -129,7 +140,7 @@ export function renderDashboard() {
 
   alertsContainer.appendChild(fragment);
 
-  // 5. Delegación de Eventos (Un solo Listener para todo el contenedor)
+  // 5. Delegación de Eventos
   alertsContainer.onclick = (e) => {
     const dismissBtn = e.target.closest('.close-x, .btn-dismiss');
     if (dismissBtn) {

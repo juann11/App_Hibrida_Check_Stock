@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Check Stock</title>
-  <script type="module" crossorigin src="/assets/index-DSx6p592.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-Cgy5aEfo.css">
+  <script type="module" crossorigin src="/assets/index-DqhQh-R1.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-Wi_sX1yf.css">
 </head>
 <body class="not-authenticated">
 
@@ -74,7 +74,7 @@
   </section>
 
   <!-- APP PRINCIPAL (Protegida) -->
-  <main class="app-container" id="app-main-content">
+<main class="app-container" id="app-main-content" style="display: block !important;">
     
     <!-- 1. DASHBOARD -->
     <section class="view" id="vista-dashboard">
@@ -109,10 +109,10 @@
       <!-- Acceso Rápido -->
       <div class="section-title">Acceso Rápido</div>
       <div class="quick-access">
-        <button class="quick-btn" id="btn-quick-entrada" data-target="vista-movimiento" data-type="ENTRADA">
+        <button class="quick-btn" id="btn-quick-entrada" data-target="vista-movimientos" data-type="ENTRADA">
           <span>📈</span><small>Entradas</small>
         </button>
-        <button class="quick-btn" id="btn-quick-salida" data-target="vista-movimiento" data-type="SALIDA">
+        <button class="quick-btn" id="btn-quick-salida" data-target="vista-movimientos" data-type="SALIDA">
           <span>📉</span><small>Salidas</small>
         </button>
         <button class="quick-btn" id="btn-quick-inv" data-target="vista-inventario">
@@ -201,7 +201,7 @@
     </section>
 
     <!-- 3. NUEVO MOVIMIENTO -->
-    <section class="view" id="vista-movimiento">
+    <section class="view" id="vista-movimientos">
       <header class="app-header header-nav">
         <div class="header-left">
           <button class="btn-back" data-target="vista-dashboard" aria-label="Volver">←</button>
@@ -271,7 +271,7 @@
       <span class="nav-icon">📦</span>
       <span class="nav-label">Inventario</span>
     </button>
-    <button class="nav-icon-btn" data-target="vista-movimiento">
+    <button class="nav-icon-btn" data-target="vista-movimientos">
       <span class="nav-icon">📋</span>
       <span class="nav-label">Movimientos</span>
     </button>
