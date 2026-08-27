@@ -683,20 +683,25 @@ body {
 }
 
 /* ==========================================================================
-   Navegación Inferior (Bottom Navbar)
+   Navegación Inferior (Bottom Navbar) - Estilo Píldora / Círculos
    ========================================================================== */
 .bottom-navbar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  height: calc(65px + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  bottom: 12px; /* Flotante desde el fondo */
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px); /* Un poco más angosta que la pantalla */
+  max-width: 480px;
+  height: 64px;
   background: #18181B;
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 1000;
+  border-radius: 32px; /* Borde redondeado estilo flotante */
+  padding: 0 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 
   .nav-icon-btn {
     background: transparent;
@@ -705,29 +710,48 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 3px;
     cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.2s, transform 0.2s;
+    opacity: 0.6;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%; /* Botón independiente en forma de círculo */
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    .nav-icon {
-      font-size: 1.25rem;
-      line-height: 1;
+    .nav-icon { 
+      font-size: 1.2rem; 
+      line-height: 1; 
+      transition: transform 0.2s ease;
+    }
+    
+    .nav-label { 
+      color: #A1A1AA; 
+      font-size: 0.62rem; 
+      font-weight: 600; 
+      transition: color 0.2s ease;
     }
 
-    .nav-label {
-      color: #FFFFFF;
-      font-size: 0.65rem;
-      font-weight: 600;
+    /* Estado Hover (al pasar el mouse por encima) */
+    &:hover {
+      opacity: 0.9;
+      background: rgba(255, 255, 255, 0.08);
+      .nav-icon { transform: translateY(-1px); }
     }
 
+    /* Estado Activo (Botón seleccionado) */
     &.active {
       opacity: 1;
-      transform: translateY(-2px);
+      background: #27272A; /* Fondo independiente resaltado */
+      border: 1px solid #3F3F46;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 
-      .nav-label {
-        color: #FFFFFF;
-        font-weight: 700;
+      .nav-icon { 
+        transform: translateY(-1px) scale(1.1); 
+      }
+
+      .nav-label { 
+        color: #FFFFFF; 
+        font-weight: 700; 
       }
     }
   }
