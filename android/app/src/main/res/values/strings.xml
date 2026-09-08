@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Check Stock</string>
+    <string name="title_activity_main">Check Stock</string>
+    <string name="package_name">com.upb.checkstock</string>
+    <string name="custom_url_scheme">com.upb.checkstock</string>
+</resources>
