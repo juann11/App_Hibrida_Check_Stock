@@ -695,26 +695,25 @@ body {
 }
 
 /* ==========================================================================
-   Navegación Inferior (Bottom Navbar) - Estilo Píldora / Círculos
+   Navegación Inferior (Estilo Claro con Home Central Destacado)
    ========================================================================== */
 .bottom-navbar {
   position: fixed;
-  /* Se adapta dinámicamente a la barra de gestos de Android */
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: 480px;
+  width: calc(100% - 28px);
+  max-width: 440px;
   height: 64px;
-  background: #18181B;
+  background: #FFFFFF; /* Color claro pedido por el profesor */
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 1000;
   border-radius: 32px;
-  padding: 0 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid #E4E4E7;
 
   .nav-icon-btn {
     background: transparent;
@@ -723,46 +722,58 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 2px;
     cursor: pointer;
     opacity: 0.6;
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
 
     .nav-icon { 
-      font-size: 1.2rem; 
+      font-size: 1.25rem; 
       line-height: 1; 
-      transition: transform 0.2s ease;
     }
     
     .nav-label { 
-      color: #A1A1AA; 
+      color: #71717A; 
       font-size: 0.62rem; 
       font-weight: 600; 
-      transition: color 0.2s ease;
     }
 
     &:hover {
       opacity: 0.9;
-      background: rgba(255, 255, 255, 0.08);
-      .nav-icon { transform: translateY(-1px); }
+      background: #F4F4F5;
     }
 
     &.active {
       opacity: 1;
-      background: #27272A;
-      border: 1px solid #3F3F46;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-
-      .nav-icon { 
-        transform: translateY(-1px) scale(1.1); 
-      }
+      background: #F4F4F5;
 
       .nav-label { 
-        color: #FFFFFF; 
+        color: #18181B; 
         font-weight: 700; 
+      }
+    }
+
+    /* BOTÓN HOME CENTRAL DESTACADO */
+    &.nav-btn-home {
+      opacity: 1;
+      background: #18181B; /* Resaltado oscuro diferenciado */
+      color: #FFFFFF;
+      width: 54px;
+      height: 54px;
+      transform: translateY(-8px); /* Efecto flotante hacia arriba */
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+
+      .nav-label {
+        color: #FFFFFF;
+        font-size: 0.6rem;
+      }
+
+      &.active {
+        background: #2563EB; /* Azul primario al estar activo */
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
       }
     }
   }
