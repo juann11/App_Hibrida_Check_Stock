@@ -259,19 +259,25 @@
   </main>
 
 <nav class="bottom-navbar" id="bottom-nav">
+  <button class="nav-icon-btn" data-target="vista-dashboard">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Inicio</span>
+  </button>
+
   <button class="nav-icon-btn" data-target="vista-inventario">
     <span class="nav-icon">📦</span>
     <span class="nav-label">Inventario</span>
   </button>
 
-  <button class="nav-icon-btn nav-btn-home" data-target="vista-dashboard">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-label">Inicio</span>
+  <!-- Botón Central Acción Principal (NUEVO) -->
+  <button class="nav-icon-btn nav-btn-center" data-target="vista-movimientos">
+    <span class="nav-icon">➕</span>
+    <span class="nav-label">Nuevo</span>
   </button>
 
   <button class="nav-icon-btn" data-target="vista-movimientos">
     <span class="nav-icon">📋</span>
-    <span class="nav-label">Movimientos</span>
+    <span class="nav-label">Historial</span>
   </button>
 
   <button class="nav-icon-btn" data-target="vista-reportes">
@@ -279,6 +285,7 @@
     <span class="nav-label">Reportes</span>
   </button>
 </nav>
+
 
   <script type="module" src="./src/js/main.js"></script>
 </body>
